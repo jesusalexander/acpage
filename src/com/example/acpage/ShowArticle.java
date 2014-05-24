@@ -28,7 +28,7 @@ public class ShowArticle extends Activity {
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.ac_article);
-		
+		//test?
 		bar = getActionBar();
 		bar.setDisplayHomeAsUpEnabled(true);
 		

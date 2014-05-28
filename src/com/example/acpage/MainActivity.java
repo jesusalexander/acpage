@@ -32,7 +32,7 @@ import android.os.Build;
 public class MainActivity extends ActionBarActivity {
 	
 	String acPageUrl = "http://www.acfun.com/v/list63/index.htm";
-	String htmlElements = ".th-list > .item";
+	String htmlElements = "div.l div.item";
 	private ListView listView;  
 	ProgressDialog dialog;
 	
@@ -83,9 +83,12 @@ public class MainActivity extends ActionBarActivity {
 				
 				Intent intent = new Intent(MainActivity.this,ShowArticle.class);
 				Bundle bundle = new Bundle();
+				
+				
 				bundle.putString("Url",map.get("ItemUrl"));
 				intent.putExtras(bundle);
 				startActivity(intent);
+				Log.v("GetHtml",map.get("ItemUrl"));
 			}
         });
 	}
@@ -102,6 +105,7 @@ public class MainActivity extends ActionBarActivity {
 				
 				Message msg = Message.obtain();
 				Bundle data = new Bundle();
+				
 				data.putString("message", acPageHtml);
 				msg.setData(data);
 				handler.sendMessage(msg);
@@ -120,6 +124,7 @@ public class MainActivity extends ActionBarActivity {
 			String acHtml = msg.getData().getString("message");
 			Elements acHtmlEle = JsoupHtml.getItems(acHtml,htmlElements);
 			//acPageHtmlView.setText(acHtml);
+			//Log.v("GetListHtml",acHtmlEle.toString());
 			Log.v("GetHtml","msg");
 			setListView(acHtmlEle);
 			

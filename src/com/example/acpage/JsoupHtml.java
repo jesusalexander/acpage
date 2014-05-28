@@ -5,6 +5,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import android.util.Log;
+
 public class JsoupHtml {
 	public static Elements getItems(String HTML,String ELEMENT){
 		Document doc  = Jsoup.parse(HTML);
@@ -33,7 +35,7 @@ public class JsoupHtml {
 		String itemS = itemE.toString();
 		Document itemD = Jsoup.parse(itemS);
 		
-		Element titleE = itemD.select(".title-info").first();
+		Element titleE = itemD.select(".article-info").first();
 		String titleS = titleE.text();
 		return titleS;
 	}

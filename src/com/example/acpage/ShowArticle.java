@@ -15,6 +15,7 @@ import android.text.Html;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.MenuItem;
+import android.webkit.WebView;
 import android.widget.TextView;
 
 public class ShowArticle extends Activity {
@@ -23,7 +24,7 @@ public class ShowArticle extends Activity {
 	
 	String acArticleUrl ="http://www.acfun.com/";
 	String htmlElements = "#area-player";
-	private TextView acArtTV;
+	WebView pageWebView ;
 	@SuppressLint("NewApi")
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -31,16 +32,31 @@ public class ShowArticle extends Activity {
 		//test?
 		bar = getActionBar();
 		bar.setDisplayHomeAsUpEnabled(true);
-		
+		pageWebView = (WebView)findViewById(R.id.pageWebView);
 		
 		Intent intent = getIntent();
 		Bundle bundle = intent.getExtras();
 		acArticleUrl = acArticleUrl+bundle.getString("Url");
 		dialog = ProgressDialog.show(this, "文章加载中...","有种打我啊...");
+		
+		Log.v("ShowArticle","onCreate");
 		getHtml(acArticleUrl);
 	}
 	
+	
+
+	public void showWebView(String acPageHtml,WebView pageWebView){
+		Log.v("ShowArticle","showWebView");
+		pageWebView.loadDataWithBaseURL(null, acPageHtml, "text/html", "utf-8", null);
+		pageWebView.getSettings().setJavaScriptEnabled(false);
+		pageWebView.getSettings().setSupportZoom(true);
+		pageWebView.getSettings().setBlockNetworkImage(true);
+		pageWebView.getSettings().setLoadsImagesAutomatically(false);
+		dialog.dismiss();
+		
+	}
 	//UI更新
+
 	public void getHtml(final String acPageUrlc){
 		new Thread(new Runnable(){
 			public void run(){
@@ -52,7 +68,7 @@ public class ShowArticle extends Activity {
 				data.putString("message", acPageHtml);
 				msg.setData(data);
 				handler.sendMessage(msg);
-				Log.v("GetHtml","send msg");
+				Log.v("ShowArticle","send msg");
 
 			}
 		}).start();
@@ -67,11 +83,15 @@ public class ShowArticle extends Activity {
 			//解析并获取htmlElements元素
 			Elements acHtmlEle = JsoupHtml.getItems(acHtml,htmlElements);
 			//acPageHtmlView.setText(acHtml);
-			Log.v("GetHtml","msg");
-			String acHtmlStr = JsoupHtml.getArticle(acHtmlEle.first());
 			
-			acArtTV = (TextView)findViewById(R.id.acContent);
-			acArtTV.setText(Html.fromHtml(acHtmlStr));
+			Log.v("ShowArticle","Handler");
+			Log.v("ShowArticle",acHtmlEle.text());
+			String acHtmlStr = JsoupHtml.getArticle(acHtmlEle.first());
+			showWebView(acHtmlStr,pageWebView);
+			
+			
+			//acArtTV = (TextView)findViewById(R.id.acContent);
+			//acArtTV.setText(Html.fromHtml(acHtmlStr));
 			//滚动条
 			//acArtTV.setMovementMethod(ScrollingMovementMethod.getInstance());
 						
@@ -91,6 +111,5 @@ public class ShowArticle extends Activity {
 		return super.onOptionsItemSelected(item);
 		 
 	 }
-
 
 }

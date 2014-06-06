@@ -10,7 +10,9 @@
         android:orientation="vertical" >
         
         <TextView 
-            android:text="Title"
+            android:background="#ff000000"
+            android:textColor="#ffffffff"
+            android:text="null"
             android:textSize="20sp"
             android:id="@+id/acArtTitile"
             android:layout_width="match_parent"
@@ -22,6 +24,7 @@
             />
 
         <WebView 
+            android:background="#00000000"
             android:id="@+id/pageWebView"
             android:layout_width="fill_parent"
             android:layout_height="match_parent"

@@ -23,8 +23,10 @@ public class ShowArticle extends Activity {
 	ProgressDialog dialog;
 	
 	String acArticleUrl ="http://www.acfun.com/";
+	String acAriTitle = null;
 	String htmlElements = "#area-player";
 	WebView pageWebView ;
+	TextView acTitle;
 	@SuppressLint("NewApi")
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -33,9 +35,14 @@ public class ShowArticle extends Activity {
 		bar = getActionBar();
 		bar.setDisplayHomeAsUpEnabled(true);
 		pageWebView = (WebView)findViewById(R.id.pageWebView);
+		pageWebView.getSettings().setJavaScriptEnabled(false);
+		pageWebView.getSettings().setSupportZoom(true);
+		pageWebView.getSettings().setBlockNetworkImage(true);
+		pageWebView.getSettings().setLoadsImagesAutomatically(false);
 		
 		Intent intent = getIntent();
 		Bundle bundle = intent.getExtras();
+		acAriTitle = bundle.getString("Title");
 		acArticleUrl = acArticleUrl+bundle.getString("Url");
 		dialog = ProgressDialog.show(this, "文章加载中...","有种打我啊...");
 		
@@ -48,10 +55,7 @@ public class ShowArticle extends Activity {
 	public void showWebView(String acPageHtml,WebView pageWebView){
 		Log.v("ShowArticle","showWebView");
 		pageWebView.loadDataWithBaseURL(null, acPageHtml, "text/html", "utf-8", null);
-		pageWebView.getSettings().setJavaScriptEnabled(false);
-		pageWebView.getSettings().setSupportZoom(true);
-		pageWebView.getSettings().setBlockNetworkImage(true);
-		pageWebView.getSettings().setLoadsImagesAutomatically(false);
+
 		dialog.dismiss();
 		
 	}
@@ -88,8 +92,8 @@ public class ShowArticle extends Activity {
 			Log.v("ShowArticle",acHtmlEle.text());
 			String acHtmlStr = JsoupHtml.getArticle(acHtmlEle.first());
 			showWebView(acHtmlStr,pageWebView);
-			
-			
+			acTitle = (TextView)findViewById(R.id.acArtTitile);
+			acTitle.setText(acAriTitle);
 			//acArtTV = (TextView)findViewById(R.id.acContent);
 			//acArtTV.setText(Html.fromHtml(acHtmlStr));
 			//滚动条

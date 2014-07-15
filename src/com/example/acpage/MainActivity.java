@@ -44,7 +44,7 @@ public class MainActivity extends ActionBarActivity {
 
 	SwipeRefreshLayout refreshLayout;
 	String acPageUrl = "http://www.acfun.com/v/list63/";
-	int morePageUrl = 2;//下拉加载更多，第一张分页为 index_2.htm;
+	int morePageUrl = 2;// 下拉加载更多，第一张分页为 index_2.htm;
 	String htmlElements = "div.l div.item";
 
 	String lastPageID = null;
@@ -57,6 +57,7 @@ public class MainActivity extends ActionBarActivity {
 	ArrayList<HashMap<String, Object>> listItem;
 	int lastVisibleIndex;
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -90,7 +91,7 @@ public class MainActivity extends ActionBarActivity {
 		listView = (ListView) findViewById(R.id.acList);
 
 		// 上拉加载
-		//getHtml(String url,int method) 
+		// getHtml(String url,int method)
 		listView.addFooterView(mFooterView);
 
 		listView.setOnScrollListener(new OnScrollListener() {
@@ -101,13 +102,14 @@ public class MainActivity extends ActionBarActivity {
 				switch (scrollState) {
 				// 当视图不动&&最后一个item时
 				case OnScrollListener.SCROLL_STATE_IDLE:
-					if (view.getLastVisiblePosition() == (view.getCount() - 1)) {
-						
-						getHtml("index_"+morePageUrl+".htm", 2);//index_2.htm 加载分页
+					if (view.getLastVisiblePosition()+1 == (view.getCount())) {
+
+						getHtml("index_" + morePageUrl + ".htm", 2);// index_morePageUrl.htm 加载分页
+																
 						morePageUrl++;
 						Toast.makeText(getBaseContext(), "载入更多",
 								Toast.LENGTH_SHORT).show();
-						listView.removeFooterView(mFooterView);
+						//listView.removeFooterView(mFooterView);
 					}
 					break;
 				/*
@@ -157,11 +159,10 @@ public class MainActivity extends ActionBarActivity {
 				new int[] { R.id.actitle, R.id.acintro, R.id.acinfo });
 
 		listView.setAdapter(listItemAdapter);
-		
+
 		Toast.makeText(getBaseContext(), "setListView", Toast.LENGTH_SHORT)
-		.show();
-		
-		
+				.show();
+
 		// 启动文章activity
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -174,7 +175,7 @@ public class MainActivity extends ActionBarActivity {
 
 				Intent intent = new Intent(MainActivity.this, ShowArticle.class);
 				Bundle bundle = new Bundle();
-				bundle.putString("Title", "TITLE");
+				bundle.putString("Title", map.get("ItemTitle"));
 				bundle.putString("Url", map.get("ItemUrl"));
 				intent.putExtras(bundle);
 				startActivity(intent);
@@ -208,56 +209,49 @@ public class MainActivity extends ActionBarActivity {
 				}
 				listItemAdapter.notifyDataSetChanged();
 				refreshLayout.setRefreshing(false);
-				Toast.makeText(getBaseContext(), "reSetListView", Toast.LENGTH_SHORT)
-				.show();
+				Toast.makeText(getBaseContext(), "reSetListView",
+						Toast.LENGTH_SHORT).show();
+				
+			}
+		}, 500);
+		
+	}
+
+	// 上拉加载更多
+	public void moreSetListView(final Elements htmlEle) {
+		new Handler().postDelayed(new Runnable() {
+			public void run() {
+
+				listView.addFooterView(mFooterView);
+				for (Element e : htmlEle) {
+
+					HashMap<String, Object> map = new HashMap<String, Object>();
+
+					map.put("ItemTitle", JsoupHtml.getTitle(e));
+					map.put("ItemText", JsoupHtml.getIntro(e));
+					map.put("ItemInfo", JsoupHtml.getInfo(e));
+					map.put("ItemUrl", JsoupHtml.getUrl(e));
+					listItem.add(map);
+				}
+				listItemAdapter.notifyDataSetChanged();
+				Toast.makeText(getBaseContext(), "moreSetListView",
+						Toast.LENGTH_SHORT).show();
 				
 			}
 		}, 500);
 	}
-	//上拉加载更多
-	public void moreSetListView(final Elements htmlEle){
-		listView.addFooterView(mFooterView);
-		for (Element e : htmlEle) {
 
-			HashMap<String, Object> map = new HashMap<String, Object>();
 
-			map.put("ItemTitle", JsoupHtml.getTitle(e));
-			map.put("ItemText", JsoupHtml.getIntro(e));
-			map.put("ItemInfo", JsoupHtml.getInfo(e));
-			map.put("ItemUrl", JsoupHtml.getUrl(e));
-			listItem.add(map);
-		}
-		listItemAdapter.notifyDataSetChanged();
-		Toast.makeText(getBaseContext(), "moreSetListView", Toast.LENGTH_SHORT)
-		.show();
-	}
-
-	// 底部上拉加载更多
-	// 6.6
-	public void onScroll(ListView view, int firstVisibleItem,
-			int visibleItemCount, int totalItemCount) {
-		lastVisibleIndex = firstVisibleItem + visibleItemCount - 1;
-
-	}
-
-	public void onScrollStateChanged(ArrayList view, int scrollState) {
-		// 滑到底部后自动加载，判断listview已经停止滚动并且最后可视的条目等于adapter的条目
-		if (scrollState == OnScrollListener.SCROLL_STATE_IDLE
-				&& lastVisibleIndex == listItemAdapter.getCount()) {
-			Toast.makeText(this, "底部了。", Toast.LENGTH_LONG).show();
-
-		}
-	}
 
 	// UI更新
 	// method 0为初次加载,1为下拉刷新,2为上拉加载更多
 	public void getHtml(final String acPageUrlc, final int method) {
-		
+
 		ProgressDialog mypDialog = new ProgressDialog(this);
 		mypDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		new Thread(new Runnable() {
 			public void run() {
-				String acPageHtml = GetPage.http_get(acPageUrl+acPageUrlc);
+				String acPageHtml = GetPage.http_get(acPageUrl + acPageUrlc);
 				Log.v("GetHtml", "HTML");
 
 				Message msg = Message.obtain();
@@ -288,18 +282,19 @@ public class MainActivity extends ActionBarActivity {
 			Log.v("GetHtml", "msg");
 
 			// 下拉刷新调用reSetListView
-			
-			Log.v("getMethod",Integer.toString(getMethod));
+			// 上拉加载调用moreSetListView
+			Log.v("getMethod", Integer.toString(getMethod));
 			if (getMethod == 0) {
-				
+
 				setListView(acHtmlEle);
-				
-			}else if(getMethod == 1){
+
+			} else if (getMethod == 1) {
 				reSetListView(acHtmlEle);
-				
-			}else if(getMethod == 2){
+
+			} else if (getMethod == 2) {
 				moreSetListView(acHtmlEle);
-				
+				listView.removeFooterView(mFooterView);
+
 			}
 			// 关闭进度对话框
 			dialog.dismiss();

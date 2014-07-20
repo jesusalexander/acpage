@@ -22,7 +22,7 @@ public class ShowArticle extends Activity {
 	private ActionBar  bar = null; 
 	ProgressDialog dialog;
 	
-	String acArticleUrl ="http://www.acfun.com/";
+	String acArticleUrl ="http://www.acfun.tv/";
 	String acAriTitle = null;
 	String htmlElements = "#area-player";
 	WebView pageWebView ;

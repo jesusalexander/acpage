@@ -2,6 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:fillViewport="false"
     android:scrollbars="vertical" >
 
     <LinearLayout
@@ -10,7 +11,7 @@
         android:orientation="vertical" >
         
         <TextView 
-            android:background="#ff000000"
+            android:background="#ff222222"
             android:textColor="#ffffffff"
             android:text="null"
             android:textSize="20sp"
@@ -19,8 +20,6 @@
             android:layout_height="match_parent"
             android:paddingLeft="8dp"
             android:paddingRight="6dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
             />
 
         <WebView 
